@@ -1,13 +1,55 @@
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('Extension installed');
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("Received message in background:", request);
+
+  if (!request.action) {
+    console.warn("Received message without 'action' field:", request);
+    return true;
+  }
+
+  switch (request.action) {
+
+    case "colorPicker_captureTab":
+      debouncedCaptureTab(sender, sendResponse);
+      break;
+  default:
+      console.warn("Unknown message action:", request.action);
+  }
+  return true; // Keeps the message channel open for asynchronous responses
 });
 
-// Optional: If you need to relay messages between popup and content script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'incrementCount') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, message);
+
+
+let captureQueue = [];
+let isProcessingQueue = false;
+const CAPTURE_DELAY = 1000; // 1 second delay between captures
+
+function debouncedCaptureTab(sender, sendResponse) {
+  captureQueue.push({ sender, sendResponse });
+  if (!isProcessingQueue) {
+    processQueue();
+  }
+}
+
+function processQueue() {
+  isProcessingQueue = true;
+  if (captureQueue.length === 0) {
+    isProcessingQueue = false;
+    return;
+  }
+
+  const { sender, sendResponse } = captureQueue.shift();
+  chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
+    sendResponse({ data: dataUrl });
+    setTimeout(processQueue, CAPTURE_DELAY);
+  });
+}
+
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "activate_color_picker") {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: "toggleColorPicker"});
       }
     });
   }

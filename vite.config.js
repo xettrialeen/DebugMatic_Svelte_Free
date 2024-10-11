@@ -1,9 +1,25 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { resolve } from 'path';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [
+    svelte(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'src/lib/*',
+          dest: 'lib'
+        }
+      ]
+    })
+  ],
+  resolve: {
+    alias: {
+      '$lib': resolve(__dirname, './src/lib')
+    }
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: false,
@@ -27,12 +43,14 @@ export default defineConfig({
           if (assetInfo.name === 'popup.html') {
             return 'popup/popup.html';
           }
+          if (assetInfo.name.endsWith('.css')) {
+            return 'styles/[name][extname]';
+          }
           return '[name][extname]';
         },
       },
     },
-  },
-  optimizeDeps: {
-    include: ['svelte'],
-  },
+    target: 'esnext',
+    minify: false,
+  }
 });
