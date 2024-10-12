@@ -45,7 +45,7 @@
   
     <footer class="text-center text-zinc-200 opacity-60 text-xs"
             in:fade={{ duration: 300, delay: 300 }}>
-      Powered by <a target="_blank" class="underline hover:text-white transition-colors duration-200" href="https://www.yashitechsolutions.com">Yashitech Solutions</a>
+      Powered by <a target="_blank" class="underline hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/yashitech">Yashitech Solutions</a>
     </footer>
   {/if}
 </main>

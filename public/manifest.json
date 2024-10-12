@@ -4,7 +4,8 @@
     "version": "1.0.0",
     "description": "A Chrome extension built with Svelte",
     "action": {
-        "default_popup": "src/popup/popup.html"
+        "default_popup": "src/popup/popup.html",
+        "default_icon": "assets/logo.png"
     },
     "permissions": [
         "activeTab",

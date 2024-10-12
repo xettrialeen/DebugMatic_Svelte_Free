@@ -11,13 +11,18 @@ export default defineConfig({
         {
           src: 'src/lib/*',
           dest: 'lib'
+        },
+        {
+          src: 'src/assets/*',
+          dest: 'assets'
         }
       ]
     })
   ],
   resolve: {
     alias: {
-      '$lib': resolve(__dirname, './src/lib')
+      '$lib': resolve(__dirname, './src/lib'),
+      '$assets': resolve(__dirname, './src/assets')
     }
   },
   build: {
@@ -42,6 +47,9 @@ export default defineConfig({
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'popup.html') {
             return 'popup/popup.html';
+          }
+          if (assetInfo.name.endsWith('.png')) {
+            return 'assets/[name][extname]';
           }
           if (assetInfo.name.endsWith('.css')) {
             return 'styles/[name][extname]';
